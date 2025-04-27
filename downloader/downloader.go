@@ -86,14 +86,14 @@ func (dl *Downloader) DownloadComposite(ctx context.Context, outputFile string, 
 	if err != nil {
 		return err
 	}
-	// defer closeAndRemoveFile(videoFile, log)
+	defer closeAndRemoveFile(videoFile, log)
 
 	// Create temporary audio file
 	audioFile, err := os.CreateTemp(outputDir, "youtube_*.m4a")
 	if err != nil {
 		return err
 	}
-	// defer closeAndRemoveFile(audioFile, log)
+	defer closeAndRemoveFile(audioFile, log)
 
 	log.Debug("Downloading video file...")
 	err = dl.videoDLWorker(ctx, videoFile, v, videoFormat)

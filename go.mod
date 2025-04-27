@@ -1,4 +1,4 @@
-module github.com/kkdai/youtube/v2
+module github.com/WangWilly/go-youtube-dl
 
 go 1.23.0
 

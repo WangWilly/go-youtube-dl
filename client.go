@@ -49,7 +49,8 @@ type Client struct {
 
 	client *clientInfo
 
-	consentID string
+	consentID      string
+	xgoogvisitorid string
 }
 
 func (c *Client) assureClient() {
@@ -524,8 +525,9 @@ func (c *Client) httpDo(req *http.Request) (*http.Response, error) {
 	}
 
 	req.Header.Set("User-Agent", c.client.userAgent)
-	req.Header.Set("Origin", "https://youtube.com")
-	req.Header.Set("Sec-Fetch-Mode", "navigate")
+	req.Header.Set("Origin", "https://www.youtube.com")
+	req.Header.Set("Referer", "https://www.youtube.com/")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 
 	if len(c.consentID) == 0 {
 		c.consentID = strconv.Itoa(rand.Intn(899) + 100) //nolint:gosec
@@ -605,10 +607,15 @@ func (c *Client) httpPost(ctx context.Context, url string, body interface{}) (*h
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 
-	if xgoogvisitorid, err := getVisitorId(); err != nil {
-		return nil, err
+	if c.xgoogvisitorid != "" {
+		req.Header.Set("x-goog-visitor-id", c.xgoogvisitorid)
 	} else {
-		req.Header.Set("x-goog-visitor-id", xgoogvisitorid)
+		if xgoogvisitorid, err := getVisitorId(); err != nil {
+			return nil, err
+		} else {
+			c.xgoogvisitorid = xgoogvisitorid
+			req.Header.Set("x-goog-visitor-id", xgoogvisitorid)
+		}
 	}
 
 	resp, err := c.httpDo(req)
